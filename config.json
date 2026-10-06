@@ -9,20 +9,6 @@
       "culinary exploration",
       "dining spot curation",
       "trip itinerary organization"
-    ]{
-  "x": {
-    "username": "@VocAiSage",
-    "daily_target": 20,
-    "min_delay_seconds": 300,
-    "search_queries": [
-      "dining alternatives",
-      "travel maps",
-      "culinary exploration",
-      "dining spot curation",
-      "trip itinerary organization",
-      "Beli alternative",
-      "food mapping alternatives",
-      "spot mapping alternatives"
     ]
   },
   "reddit": {
@@ -46,16 +32,55 @@
       "CasualConversation"
     ],
     "competitor_communities": [
-      "beli"
+      "beli",
+      "GoogleMaps",
+      "travel",
+      "solotravel",
+      "iosapps",
+      "androidapps",
+      "Productivity",
+      "FoodNYC",
+      "AskLosAngeles"
     ],
     "competitor_search_keywords": [
       "Beli",
       "Beli alternative",
+      "Mapstr",
+      "Mapstr alternative",
+      "Wanderlog",
+      "Wanderlog alternative",
+      "Plotline",
+      "Plotline alternative",
+      "Stasht",
+      "Stasht alternative",
+      "Google Maps saved places alternative",
+      "google maps saved places lag",
+      "app like Beli",
+      "how to organize saved restaurants",
+      "best app to remember places",
+      "save spots from instagram",
+      "app to track places to visit",
       "food mapping alternatives",
       "spot mapping alternatives"
     ],
     "search_queries": [
+      "Beli",
       "Beli alternative",
+      "Mapstr",
+      "Mapstr alternative",
+      "Wanderlog",
+      "Wanderlog alternative",
+      "Plotline",
+      "Plotline alternative",
+      "Stasht",
+      "Stasht alternative",
+      "Google Maps saved places alternative",
+      "google maps saved places lag",
+      "app like Beli",
+      "how to organize saved restaurants",
+      "best app to remember places",
+      "save spots from instagram",
+      "app to track places to visit",
       "food mapping alternatives",
       "spot mapping alternatives"
     ]
@@ -70,39 +95,26 @@
         "trip itinerary organization",
         "dining spots",
         "travel itinerary",
+        "Beli",
         "Beli alternative",
+        "Mapstr",
+        "Mapstr alternative",
+        "Wanderlog",
+        "Wanderlog alternative",
+        "Plotline",
+        "Plotline alternative",
+        "Stasht",
+        "Stasht alternative",
+        "Google Maps saved places alternative",
+        "google maps saved places lag",
+        "app like Beli",
+        "how to organize saved restaurants",
+        "best app to remember places",
+        "save spots from instagram",
+        "app to track places to visit",
         "food mapping alternatives",
         "spot mapping alternatives"
       ]
     }
-  ],
-  "reply_style": "Authentic tone that naturally mentions Ready to Echo as a helpful app for culinary exploration, dining spot curation, and trip itinerary organization."
-}
-  },
-  "reddit": {
-    "username": "mguozhen",
-    "daily_target": 10,
-    "min_delay_seconds": 600,
-    "subreddits": [
-      "travel",
-      "food",
-      "local spots",
-      "culinary",
-      "itinerary"
-    ]
-  },
-  "products": [
-    {
-      "name": "Ready to Echo",
-      "description": "An app for culinary exploration, dining spot curation, and trip itinerary organization.",
-      "trigger_keywords": [
-        "culinary exploration",
-        "dining spot curation",
-        "trip itinerary organization",
-        "dining spots",
-        "travel itinerary"
-      ]
-    }
-  ],
-  "reply_style": "Authentic tone that naturally mentions Ready to Echo as a helpful app for culinary exploration, dining spot curation, and trip itinerary organization."
+  ]
 }
