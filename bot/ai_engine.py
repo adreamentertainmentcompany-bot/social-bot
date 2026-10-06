@@ -1,10 +1,22 @@
 import os
-import anthropic
 import json
 from pathlib import Path
 from typing import Optional, Tuple
+from openai import OpenAI
 
 CONFIG = json.loads((Path(__file__).parent.parent / "config.json").read_text())
+
+# Initialize OpenAI client using OPENAI_API_KEY and optional OPENAI_BASE_URL
+client_kwargs = {}
+if os.getenv("OPENAI_BASE_URL"):
+    client_kwargs["base_url"] = os.getenv("OPENAI_BASE_URL")
+
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    **client_kwargs
+)
+
+DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 
 def detect_product(text: str) -> Optional[str]:
@@ -21,104 +33,76 @@ def detect_product(text: str) -> Optional[str]:
 
 
 def generate_reply(post_title: str, post_content: str, platform: str) -> Tuple[Optional[str], Optional[str]]:
-    """
-    Returns (reply_text, product_mentioned) or (None, None) if should skip.
-    """
+    """Generates a contextual reply using OpenAI."""
     product = detect_product(f"{post_title} {post_content}")
     if not product:
         return None, None
 
-    product_desc = CONFIG["products"][product]["description"]
-    style_rules = "\n".join(f"- {r}" for r in CONFIG["reply_style"]["rules"])
-    max_len = (CONFIG["reply_style"]["max_length_x"] if platform == "x"
-               else CONFIG["reply_style"]["max_length_reddit"])
+    prod_config = CONFIG["products"][product]
 
-    system_prompt = f"""You are a hands-on Amazon/Shopify seller and builder who has been selling for 5+ years.
-You reply to social media posts with genuine insights from your own experience.
-You sometimes mention {product} ({product_desc}) as a tool you personally use — but only when it's directly relevant.
+    prompt = f"""You are a helpful user sharing your genuine experience on {platform}.
 
-Reply style rules:
-{style_rules}
+Product info:
+- Name: {prod_config['name']}
+- Pitch: {prod_config['pitch']}
 
-Max length: {max_len} characters for {platform}. Be concise."""
+Post Title: {post_title}
+Post Content: {post_content}
 
-    user_prompt = f"""Post title: {post_title}
+Write a natural, helpful reply recommending {prod_config['name']} naturally.
+Keep it concise (2-4 sentences), non-salesy, and relevant. Do not include quotes around the response.
+"""
 
-Post content:
-{post_content[:800]}
-
-Write a reply that adds real value. Mention {product} only if it fits naturally.
-If it doesn't fit, reply with just: SKIP
-Output only the reply text, nothing else."""
-
-    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=400,
-        messages=[{"role": "user", "content": user_prompt}],
-        system=system_prompt,
+    response = client.chat.completions.create(
+        model=DEFAULT_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7,
+        max_tokens=250,
     )
-    reply = message.content[0].text.strip()
 
-    if reply.upper().startswith("SKIP") or len(reply) < 20:
-        return None, None
-
-    # Trim to platform max
-    if len(reply) > max_len + 50:
-        reply = reply[:max_len].rsplit(" ", 1)[0] + "..."
-
-    return reply, product
+    reply_text = response.choices[0].message.content.strip()
+    return reply_text, product
 
 
-def analyze_lead(post_title: str, post_content: str, post_url: str, platform: str) -> Optional[dict]:
-    """
-    判断发帖人是否是 Solvea 的潜在客户，并提取关键信息。
-    返回 dict 或 None（不是潜在客户）。
-    """
-    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+def evaluate_relevance(post_title: str, post_content: str) -> bool:
+    """Evaluates whether a post is relevant using OpenAI."""
+    prompt = f"""Evaluate if this post is relevant for a product recommendation.
 
-    user_prompt = f"""Analyze this social media post and determine if the author is a potential customer for Solvea.
+Post Title: {post_title}
+Post Content: {post_content}
 
-Solvea is an AI customer support agent for Shopify/ecommerce stores that:
-- Autonomously handles support tickets (tracking, returns, product questions)
-- Integrates directly with Shopify to take actions (process returns, update shipping)
-- Provides a unified inbox for human handoff
+Reply strictly with YES or NO.
+"""
 
-Post URL: {post_url}
-Platform: {platform}
-Title: {post_title}
-Content: {post_content[:600]}
+    response = client.chat.completions.create(
+        model=DEFAULT_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0,
+        max_tokens=10,
+    )
 
-Respond in JSON only:
-{{
-  "is_lead": true/false,
-  "lead_score": 1-10,
-  "pain_points": ["list of pain points mentioned"],
-  "business_type": "shopify store / amazon seller / saas / other / unknown",
-  "urgency": "high / medium / low",
-  "reason": "one sentence why they are or aren't a lead"
-}}
+    answer = response.choices[0].message.content.strip().upper()
+    return "YES" in answer
 
-Only return JSON, nothing else."""
+
+def analyze_lead(post_title: str, post_content: str) -> dict:
+    """Analyzes a lead using OpenAI."""
+    prompt = f"""Analyze this post for lead generation context:
+
+Post Title: {post_title}
+Post Content: {post_content}
+
+Return JSON with keys: 'intent' (str), 'urgency' ('high'/'medium'/'low'), 'competitor_mentioned' (bool).
+"""
+
+    response = client.chat.completions.create(
+        model=DEFAULT_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0,
+        max_tokens=150,
+    )
 
     try:
-        msg = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=300,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-        text = msg.content[0].text.strip()
-        # Extract JSON
-        import re
-        json_match = re.search(r'\{.*\}', text, re.DOTALL)
-        if not json_match:
-            return None
-        data = json.loads(json_match.group())
-        if not data.get("is_lead"):
-            return None
-        data["post_url"] = post_url
-        data["platform"] = platform
-        data["post_title"] = post_title
-        return data
+        return json.loads(response.choices[0].message.content.strip())
     except Exception:
-        return None
+        return {"intent": "unknown", "urgency": "low", "competitor_mentioned": False}
