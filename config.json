@@ -9,7 +9,75 @@
       "culinary exploration",
       "dining spot curation",
       "trip itinerary organization"
+    ]{
+  "x": {
+    "username": "@VocAiSage",
+    "daily_target": 20,
+    "min_delay_seconds": 300,
+    "search_queries": [
+      "dining alternatives",
+      "travel maps",
+      "culinary exploration",
+      "dining spot curation",
+      "trip itinerary organization",
+      "Beli alternative",
+      "food mapping alternatives",
+      "spot mapping alternatives"
     ]
+  },
+  "reddit": {
+    "username": "mguozhen",
+    "daily_target": 10,
+    "min_delay_seconds": 600,
+    "subreddits": [
+      "travel",
+      "food",
+      "local spots",
+      "culinary",
+      "itinerary",
+      "Besteverfoodreviewshow",
+      "AskCulinary",
+      "bermuda",
+      "alphaandbetausers",
+      "AppsWebapps",
+      "AppHookup",
+      "AppIdeas",
+      "askreddit",
+      "CasualConversation"
+    ],
+    "competitor_communities": [
+      "beli"
+    ],
+    "competitor_search_keywords": [
+      "Beli",
+      "Beli alternative",
+      "food mapping alternatives",
+      "spot mapping alternatives"
+    ],
+    "search_queries": [
+      "Beli alternative",
+      "food mapping alternatives",
+      "spot mapping alternatives"
+    ]
+  },
+  "products": [
+    {
+      "name": "Ready to Echo",
+      "description": "An app for culinary exploration, dining spot curation, and trip itinerary organization.",
+      "trigger_keywords": [
+        "culinary exploration",
+        "dining spot curation",
+        "trip itinerary organization",
+        "dining spots",
+        "travel itinerary",
+        "Beli alternative",
+        "food mapping alternatives",
+        "spot mapping alternatives"
+      ]
+    }
+  ],
+  "reply_style": "Authentic tone that naturally mentions Ready to Echo as a helpful app for culinary exploration, dining spot curation, and trip itinerary organization."
+}
   },
   "reddit": {
     "username": "mguozhen",
